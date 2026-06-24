@@ -2,25 +2,40 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ClipboardList, LineChart, MessageSquare, User, Video } from "lucide-react";
+import {
+  ClipboardList,
+  LineChart,
+  MessageSquare,
+  User,
+  Utensils,
+  Video,
+} from "lucide-react";
 
 import type {
   SerializedAssignment,
   SerializedSession,
   SerializedMessage,
 } from "@/lib/schemas/progress";
+import type {
+  SerializedMealPlanAssignment,
+  SerializedFoodLog,
+} from "@/lib/schemas/nutrition";
+import type { SerializedCheckin } from "@/lib/schemas/checkin";
+import type { Macros } from "@/lib/foods";
 
 import OverviewTab from "./OverviewTab";
 import AssignmentsTab from "./AssignmentsTab";
 import ProgressTab from "./ProgressTab";
 import MessagesTab from "./MessagesTab";
 import EngagementTab, { type EngagementItem } from "./EngagementTab";
+import NutritionTab from "./NutritionTab";
 
 type WorkoutOption = { id: string; name: string; blockCount: number };
 
 const tabs = [
   { id: "overview", label: "Overview", icon: User },
   { id: "workouts", label: "Workouts", icon: ClipboardList },
+  { id: "nutrition", label: "Nutrition", icon: Utensils },
   { id: "progress", label: "Progress", icon: LineChart },
   { id: "engagement", label: "Engagement", icon: Video },
   { id: "messages", label: "Messages", icon: MessageSquare },
@@ -38,6 +53,10 @@ export default function ClientDetailTabs({
   initialSessions,
   initialMessages,
   engagement,
+  mealPlanOptions,
+  mealPlanAssignments,
+  foodLogs,
+  checkins,
 }: {
   clientId: string;
   clientName: string;
@@ -48,6 +67,10 @@ export default function ClientDetailTabs({
   initialSessions: SerializedSession[];
   initialMessages: SerializedMessage[];
   engagement: EngagementItem[];
+  mealPlanOptions: { id: string; name: string; targets: Macros; mealCount: number }[];
+  mealPlanAssignments: SerializedMealPlanAssignment[];
+  foodLogs: SerializedFoodLog[];
+  checkins: SerializedCheckin[];
 }) {
   const [active, setActive] = useState<TabId>("overview");
 
@@ -108,6 +131,16 @@ export default function ClientDetailTabs({
               clientId={clientId}
               assignments={initialAssignments}
               initialSessions={initialSessions}
+              checkins={checkins}
+            />
+          )}
+          {active === "nutrition" && (
+            <NutritionTab
+              clientId={clientId}
+              clientName={clientName}
+              planOptions={mealPlanOptions}
+              initialAssignments={mealPlanAssignments}
+              recentLogs={foodLogs}
             />
           )}
           {active === "engagement" && (

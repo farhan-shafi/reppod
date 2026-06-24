@@ -8,17 +8,23 @@ import type {
   SerializedAssignment,
   SerializedSession,
 } from "@/lib/schemas/progress";
+import type { SerializedCheckin } from "@/lib/schemas/checkin";
 import LogSessionModal from "./LogSessionModal";
 import VolumeChart from "./VolumeChart";
+import MetricChart from "@/components/checkins/MetricChart";
+import CheckinList from "@/components/checkins/CheckinList";
+import PhotoGallery from "@/components/checkins/PhotoGallery";
 
 export default function ProgressTab({
   clientId,
   assignments,
   initialSessions,
+  checkins,
 }: {
   clientId: string;
   assignments: SerializedAssignment[];
   initialSessions: SerializedSession[];
+  checkins: SerializedCheckin[];
 }) {
   const [sessions, setSessions] = useState(initialSessions);
   const [logOpen, setLogOpen] = useState(false);
@@ -36,6 +42,21 @@ export default function ProgressTab({
           volume: s.totalVolume,
         })),
     [sessions]
+  );
+
+  const weightData = useMemo(
+    () =>
+      [...checkins]
+        .filter((c) => typeof c.weightKg === "number")
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .map((c) => ({
+          date: new Date(c.date).toLocaleDateString(undefined, {
+            month: "short",
+            day: "numeric",
+          }),
+          value: c.weightKg as number,
+        })),
+    [checkins]
   );
 
   async function deleteSession(id: string) {
@@ -71,6 +92,32 @@ export default function ProgressTab({
         </button>
       </div>
 
+      {/* Check-ins & body weight (client-submitted) */}
+      {checkins.length > 0 && (
+        <div className="space-y-5">
+          {weightData.length >= 2 && (
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+              <h3 className="text-xs uppercase tracking-wider text-white/50 mb-3">
+                Body weight trend
+              </h3>
+              <MetricChart data={weightData} unit="kg" />
+            </div>
+          )}
+          {checkins.some((c) => c.photos.length > 0) && (
+            <PhotoGallery checkins={checkins} />
+          )}
+          <div>
+            <h3 className="text-xs uppercase tracking-wider text-white/50 mb-2">
+              Recent check-ins
+            </h3>
+            <CheckinList checkins={checkins} />
+          </div>
+        </div>
+      )}
+
+      <h3 className="text-xs uppercase tracking-wider text-white/50 pt-2">
+        Training volume
+      </h3>
       {assignments.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-white/15 p-8 text-center text-sm text-white/60">
           Assign a workout in the <strong>Workouts</strong> tab first, then log

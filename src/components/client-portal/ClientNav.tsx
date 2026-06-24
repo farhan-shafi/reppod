@@ -11,6 +11,7 @@ import {
   LogOut,
   MessageSquare,
   Settings,
+  Utensils,
   type LucideIcon,
 } from "lucide-react";
 
@@ -18,6 +19,7 @@ type NavItem = { href: string; label: string; icon: LucideIcon };
 
 const items: NavItem[] = [
   { href: "/app", label: "Today", icon: Home },
+  { href: "/app/nutrition", label: "Nutrition", icon: Utensils },
   { href: "/app/progress", label: "Progress", icon: LineChart },
   { href: "/app/messages", label: "Messages", icon: MessageSquare },
   { href: "/app/settings", label: "Settings", icon: Settings },

@@ -11,12 +11,22 @@ import { WorkoutAssignment } from "@/models/WorkoutAssignment";
 import { WorkoutSession } from "@/models/WorkoutSession";
 import { Message } from "@/models/Message";
 import { VideoProgress } from "@/models/VideoProgress";
+import { MealPlan } from "@/models/MealPlan";
+import { MealPlanAssignment } from "@/models/MealPlanAssignment";
+import { FoodLog } from "@/models/FoodLog";
+import { Checkin } from "@/models/Checkin";
 import { GOAL_LABELS, STATUS_LABELS } from "@/lib/schemas/client";
 import type {
   SerializedAssignment,
   SerializedSession,
   SerializedMessage,
 } from "@/lib/schemas/progress";
+import {
+  computeMacros,
+  type SerializedMealPlanAssignment,
+  type SerializedFoodLog,
+} from "@/lib/schemas/nutrition";
+import type { SerializedCheckin } from "@/lib/schemas/checkin";
 import ClientDetailTabs from "@/components/client-detail/ClientDetailTabs";
 import type { EngagementItem } from "@/components/client-detail/EngagementTab";
 
@@ -52,6 +62,27 @@ export default async function ClientDetailPage({ params }: Params) {
       Message.find({ client: id }).sort({ createdAt: 1 }).lean(),
       VideoProgress.find({ client: id }).lean(),
     ]);
+
+  const [allMealPlans, mealAssignmentDocs, foodLogDocs] = await Promise.all([
+    MealPlan.find({ trainer: user.id }).select("name targets meals").sort({ name: 1 }).lean(),
+    MealPlanAssignment.find({ client: id })
+      .populate<{
+        mealPlan: {
+          _id: Types.ObjectId;
+          name: string;
+          targets: { calories: number; protein: number; carbs: number; fat: number };
+          meals: unknown[];
+        };
+      }>({ path: "mealPlan", model: MealPlan, select: "name targets meals" })
+      .sort({ assignedAt: -1 })
+      .lean(),
+    FoodLog.find({ client: id }).sort({ date: -1 }).limit(7).lean(),
+  ]);
+
+  const checkinDocs = await Checkin.find({ client: id })
+    .sort({ date: -1 })
+    .limit(60)
+    .lean();
 
   // Build the per-exercise video engagement list from assigned workouts.
   const progressMap = new Map(
@@ -120,6 +151,50 @@ export default async function ClientDetailPage({ params }: Params) {
     createdAt: m.createdAt,
   }));
 
+  const mealPlanOptions = allMealPlans.map((p) => ({
+    id: String(p._id),
+    name: p.name,
+    targets: p.targets,
+    mealCount: p.meals.length,
+  }));
+
+  const mealPlanAssignments: SerializedMealPlanAssignment[] = mealAssignmentDocs
+    .filter((a) => a.mealPlan)
+    .map((a) => ({
+      id: String(a._id),
+      client: String(a.client),
+      mealPlan: {
+        id: String(a.mealPlan._id),
+        name: a.mealPlan.name,
+        targets: a.mealPlan.targets,
+        mealCount: Array.isArray(a.mealPlan.meals) ? a.mealPlan.meals.length : 0,
+      },
+      assignedAt: a.assignedAt,
+      status: a.status,
+    }));
+
+  const foodLogs: SerializedFoodLog[] = foodLogDocs.map((l) => ({
+    id: String(l._id),
+    client: String(l.client),
+    date: l.date,
+    entries: l.entries,
+    totals: computeMacros(l.entries),
+  }));
+
+  const checkins: SerializedCheckin[] = checkinDocs.map((c) => ({
+    id: String(c._id),
+    client: String(c.client),
+    date: c.date,
+    weightKg: c.weightKg,
+    measurements: c.measurements,
+    energy: c.energy,
+    sleep: c.sleep,
+    mood: c.mood,
+    adherence: c.adherence,
+    note: c.note,
+    photos: c.photos,
+  }));
+
   const startDate = doc.startDate
     ? new Date(doc.startDate).toLocaleDateString(undefined, {
         month: "short",
@@ -181,6 +256,10 @@ export default async function ClientDetailPage({ params }: Params) {
         initialSessions={sessions}
         initialMessages={messages}
         engagement={engagement}
+        mealPlanOptions={mealPlanOptions}
+        mealPlanAssignments={mealPlanAssignments}
+        foodLogs={foodLogs}
+        checkins={checkins}
       />
     </div>
   );

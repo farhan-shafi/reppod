@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { randomBytes } from "crypto";
 import { auth } from "@/auth";
 import { connectDB } from "@/lib/mongoose";
-import { Client } from "@/models/Client";
-import { clientCreateSchema } from "@/lib/schemas/client";
+import { MealPlan } from "@/models/MealPlan";
+import { mealPlanCreateSchema } from "@/lib/schemas/nutrition";
 import { getLimits } from "@/lib/billing/subscription";
 
 export async function GET() {
@@ -13,12 +12,12 @@ export async function GET() {
   }
 
   await connectDB();
-  const clients = await Client.find({ trainer: session.user.id })
+  const docs = await MealPlan.find({ trainer: session.user.id })
     .sort({ createdAt: -1 })
     .lean();
 
   return NextResponse.json({
-    clients: clients.map(({ _id, trainer, ...rest }) => ({
+    mealPlans: docs.map(({ _id, trainer, ...rest }) => ({
       id: String(_id),
       trainer: String(trainer),
       ...rest,
@@ -39,7 +38,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const parsed = clientCreateSchema.safeParse(body);
+  const parsed = mealPlanCreateSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Invalid input" },
@@ -47,38 +46,23 @@ export async function POST(request: Request) {
     );
   }
 
-  await connectDB();
-
-  // Enforce the plan's client cap.
   const limits = await getLimits(session.user.id);
-  if (Number.isFinite(limits.maxClients)) {
-    const count = await Client.countDocuments({ trainer: session.user.id });
-    if (count >= limits.maxClients) {
-      return NextResponse.json(
-        {
-          error: `You've reached your plan's limit of ${limits.maxClients} clients. Upgrade to add more.`,
-          code: "PLAN_LIMIT",
-        },
-        { status: 402 }
-      );
-    }
+  if (!limits.nutrition) {
+    return NextResponse.json(
+      { error: "Nutrition is a Pro feature. Upgrade to build meal plans.", code: "PLAN_LIMIT" },
+      { status: 402 }
+    );
   }
 
-  const created = await Client.create({
+  await connectDB();
+  const created = await MealPlan.create({
     ...parsed.data,
-    email: parsed.data.email || undefined,
-    phone: parsed.data.phone || undefined,
-    notes: parsed.data.notes || undefined,
     trainer: session.user.id,
-    inviteToken: randomBytes(24).toString("hex"),
-    inviteStatus: "pending",
   });
 
   const { _id, trainer, ...rest } = created.toObject();
   return NextResponse.json(
-    {
-      client: { id: String(_id), trainer: String(trainer), ...rest },
-    },
+    { mealPlan: { id: String(_id), trainer: String(trainer), ...rest } },
     { status: 201 }
   );
 }

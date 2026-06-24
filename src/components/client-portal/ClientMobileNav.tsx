@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, LineChart, MessageSquare, Settings } from "lucide-react";
+import { Home, LineChart, MessageSquare, Settings, Utensils } from "lucide-react";
 
 const items = [
   { href: "/app", label: "Today", icon: Home },
+  { href: "/app/nutrition", label: "Nutrition", icon: Utensils },
   { href: "/app/progress", label: "Progress", icon: LineChart },
   { href: "/app/messages", label: "Messages", icon: MessageSquare },
   { href: "/app/settings", label: "Settings", icon: Settings },

@@ -8,6 +8,8 @@ const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
 export const cloudinaryConfigured = Boolean(CLOUD_NAME && UPLOAD_PRESET);
 
+const MAX_IMAGE_MB = 10;
+
 export default function CloudinaryAvatar({
   value,
   fallbackInitials,
@@ -28,6 +30,13 @@ export default function CloudinaryAvatar({
 
     if (!cloudinaryConfigured) {
       setError("Image uploads aren't configured yet.");
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
+      const mb = (file.size / 1024 / 1024).toFixed(0);
+      setError(`That image is ${mb} MB — please keep photos under ${MAX_IMAGE_MB} MB.`);
+      if (inputRef.current) inputRef.current.value = "";
       return;
     }
 

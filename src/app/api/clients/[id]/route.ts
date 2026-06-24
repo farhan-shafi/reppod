@@ -8,6 +8,10 @@ import { WorkoutAssignment } from "@/models/WorkoutAssignment";
 import { WorkoutSession } from "@/models/WorkoutSession";
 import { Message } from "@/models/Message";
 import { Notification } from "@/models/Notification";
+import { VideoProgress } from "@/models/VideoProgress";
+import { MealPlanAssignment } from "@/models/MealPlanAssignment";
+import { FoodLog } from "@/models/FoodLog";
+import { Checkin } from "@/models/Checkin";
 import { clientUpdateSchema } from "@/lib/schemas/client";
 
 type Params = { params: Promise<{ id: string }> };
@@ -89,6 +93,10 @@ export async function DELETE(_req: Request, { params }: Params) {
     WorkoutAssignment.deleteMany({ client: doc._id }),
     WorkoutSession.deleteMany({ client: doc._id }),
     Message.deleteMany({ client: doc._id }),
+    VideoProgress.deleteMany({ client: doc._id }),
+    MealPlanAssignment.deleteMany({ client: doc._id }),
+    FoodLog.deleteMany({ client: doc._id }),
+    Checkin.deleteMany({ client: doc._id }),
   ]);
 
   // If the client had accepted their invite, remove their login + notifications.

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { LogOut, Search, Settings, User as UserIcon } from "lucide-react";
+import { CreditCard, LogOut, Search, Settings, User as UserIcon } from "lucide-react";
 import { useState } from "react";
 import NotificationBell from "@/components/notifications/NotificationBell";
 
@@ -81,6 +81,14 @@ export default function Topbar({
                 >
                   <Settings className="size-4" />
                   Settings
+                </Link>
+                <Link
+                  href="/dashboard/billing"
+                  onClick={() => setOpen(false)}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white/80 hover:bg-white/5 transition"
+                >
+                  <CreditCard className="size-4" />
+                  Billing
                 </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}

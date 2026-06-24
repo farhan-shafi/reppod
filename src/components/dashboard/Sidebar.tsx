@@ -8,6 +8,8 @@ import {
   LayoutDashboard,
   Users,
   ClipboardList,
+  Utensils,
+  CreditCard,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -18,6 +20,8 @@ const items: NavItem[] = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/clients", label: "Clients", icon: Users },
   { href: "/dashboard/workouts", label: "Workouts", icon: ClipboardList },
+  { href: "/dashboard/nutrition", label: "Nutrition", icon: Utensils },
+  { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
@@ -68,15 +72,18 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-3 py-4 border-t border-white/10">
-        <div className="px-3 py-3 rounded-lg bg-gradient-to-br from-fuchsia-500/15 to-orange-500/10 border border-white/10">
-          <p className="text-xs font-medium text-white">Trial · 13 days left</p>
+        <Link
+          href="/dashboard/billing"
+          className="block px-3 py-3 rounded-lg bg-gradient-to-br from-fuchsia-500/15 to-orange-500/10 border border-white/10 hover:border-white/20 transition"
+        >
+          <p className="text-xs font-medium text-white">Manage plan</p>
           <p className="mt-1 text-xs text-white/50">
-            Upgrade to keep unlimited clients.
+            Upgrade for unlimited clients & nutrition.
           </p>
-          <button className="mt-2 text-xs font-medium text-fuchsia-300 hover:text-fuchsia-200 transition">
-            Upgrade →
-          </button>
-        </div>
+          <span className="mt-2 inline-block text-xs font-medium text-fuchsia-300">
+            View plans →
+          </span>
+        </Link>
       </div>
     </aside>
   );
