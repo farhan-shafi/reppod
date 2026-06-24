@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Dumbbell } from "lucide-react";
 import { cn } from "@/lib/utils";
+import DemoLoginButton from "@/components/DemoLoginButton";
 
 const links = [
   { href: "#features", label: "Features" },
@@ -63,7 +64,8 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-4">
+          <DemoLoginButton variant="link" />
           <Link
             href="/sign-in"
             className="text-sm text-white/80 hover:text-white"

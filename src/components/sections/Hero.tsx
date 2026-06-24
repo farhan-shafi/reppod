@@ -3,7 +3,8 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
-import { ArrowRight, Play, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
+import DemoLoginButton from "@/components/DemoLoginButton";
 
 const container = {
   hidden: {},
@@ -91,15 +92,7 @@ export default function Hero() {
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </motion.div>
-            <motion.a
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.97 }}
-              href="#features"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/20 text-white hover:bg-white/5"
-            >
-              <Play className="size-4" />
-              Watch demo
-            </motion.a>
+            <DemoLoginButton />
           </motion.div>
 
           <motion.div
