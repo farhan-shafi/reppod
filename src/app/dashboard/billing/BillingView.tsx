@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Check, Loader2, Sparkles } from "lucide-react";
 
@@ -11,6 +11,12 @@ import {
   type BillingCycle,
   type Tier,
 } from "@/lib/billing/plans";
+import {
+  CURRENCY_CODES,
+  formatPrice,
+  guessCurrencyFromBrowser,
+  type CurrencyCode,
+} from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -39,6 +45,11 @@ export default function BillingView({
 }) {
   const [cycle, setCycle] = useState<BillingCycle>(currentCycle);
   const [loadingTier, setLoadingTier] = useState<Tier | null>(null);
+  const [currency, setCurrency] = useState<CurrencyCode>("USD");
+
+  useEffect(() => {
+    setCurrency(guessCurrencyFromBrowser());
+  }, []);
 
   const capLabel = Number.isFinite(maxClients) ? maxClients : "Unlimited";
   const usagePct = Number.isFinite(maxClients)
@@ -166,7 +177,9 @@ export default function BillingView({
               <h3 className="text-lg font-semibold text-white">{plan.name}</h3>
               <p className="mt-1 text-xs text-white/50">{plan.tagline}</p>
               <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-4xl font-bold text-white">${price}</span>
+                <span className="text-4xl font-bold text-white">
+                  {formatPrice(price, currency)}
+                </span>
                 <span className="text-white/50 text-sm">/mo</span>
               </div>
 
