@@ -15,7 +15,7 @@ export default async function ClientPortalLayout({
       <ClientNav user={user} />
       <div className="flex-1 flex flex-col min-w-0">
         <header className="sticky top-0 z-30 h-16 border-b border-white/10 bg-black/60 backdrop-blur-xl flex items-center justify-between px-6">
-          <span className="lg:hidden font-bold text-white">FlexFlow</span>
+          <span className="lg:hidden font-bold text-white">Reppod</span>
           <div className="flex-1" />
           <NotificationBell />
         </header>

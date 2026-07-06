@@ -1,7 +1,7 @@
 import SignUpForm from "./SignUpForm";
 
 export const metadata = {
-  title: "Sign up · FlexFlow",
+  title: "Sign up · Reppod",
 };
 
 export default function SignUpPage() {

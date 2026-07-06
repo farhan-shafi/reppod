@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import AcceptInviteForm from "./AcceptInviteForm";
 
 export const metadata = {
-  title: "Accept invite · FlexFlow",
+  title: "Accept invite · Reppod",
 };
 
 export default async function InvitePage({

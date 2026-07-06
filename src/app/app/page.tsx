@@ -8,7 +8,7 @@ import { WorkoutAssignment } from "@/models/WorkoutAssignment";
 import { WorkoutSession } from "@/models/WorkoutSession";
 import { Workout } from "@/models/Workout";
 
-export const metadata = { title: "Today · FlexFlow" };
+export const metadata = { title: "Today · Reppod" };
 
 export default async function ClientHome() {
   const { user, client } = await requireClient();

@@ -9,7 +9,7 @@ import WorkoutDetailView from "./WorkoutDetailView";
 type Params = { params: Promise<{ id: string }> };
 
 export const metadata = {
-  title: "Workout · FlexFlow",
+  title: "Workout · Reppod",
 };
 
 export default async function WorkoutDetailPage({ params }: Params) {

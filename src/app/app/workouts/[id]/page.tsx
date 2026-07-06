@@ -10,7 +10,7 @@ import ClientWorkoutView from "@/components/client-portal/ClientWorkoutView";
 
 type Params = { params: Promise<{ id: string }> };
 
-export const metadata = { title: "Workout · FlexFlow" };
+export const metadata = { title: "Workout · Reppod" };
 
 export default async function ClientWorkoutPage({ params }: Params) {
   const { id } = await params;

@@ -7,7 +7,7 @@ import { MealPlan } from "@/models/MealPlan";
 import { getLimits } from "@/lib/billing/subscription";
 import UpgradeGate from "@/components/billing/UpgradeGate";
 
-export const metadata = { title: "Nutrition · FlexFlow" };
+export const metadata = { title: "Nutrition · Reppod" };
 
 export default async function NutritionPage() {
   const user = await requireTrainer();

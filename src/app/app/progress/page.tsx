@@ -10,7 +10,7 @@ import type { SerializedCheckin } from "@/lib/schemas/checkin";
 import ClientProgressView from "@/components/client-portal/ClientProgressView";
 import ClientCheckinSection from "@/components/client-portal/ClientCheckinSection";
 
-export const metadata = { title: "Progress · FlexFlow" };
+export const metadata = { title: "Progress · Reppod" };
 
 export default async function ClientProgressPage() {
   const { client } = await requireClient();

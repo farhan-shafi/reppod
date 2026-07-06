@@ -115,7 +115,7 @@ export default function AcceptInviteForm({ token }: { token: string }) {
         <span className="p-1.5 rounded-lg bg-gradient-to-br from-fuchsia-500 to-orange-500">
           <Dumbbell className="size-4 text-white" />
         </span>
-        <span className="font-bold tracking-tight text-white">FlexFlow</span>
+        <span className="font-bold tracking-tight text-white">Reppod</span>
       </div>
 
       <h1 className="text-2xl font-bold text-white">

@@ -46,7 +46,7 @@ export default function Navbar() {
             <Dumbbell className="size-4 text-white" />
           </motion.span>
           <span className="font-bold text-lg tracking-tight text-white">
-            FlexFlow
+            Reppod
           </span>
         </a>
 

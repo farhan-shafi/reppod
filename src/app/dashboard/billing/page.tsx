@@ -5,7 +5,7 @@ import { getOrCreateSubscription } from "@/lib/billing/subscription";
 import { billingMode } from "@/lib/billing/provider";
 import BillingView from "./BillingView";
 
-export const metadata = { title: "Billing · FlexFlow" };
+export const metadata = { title: "Billing · Reppod" };
 
 export default async function BillingPage() {
   const user = await requireTrainer();

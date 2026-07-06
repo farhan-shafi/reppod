@@ -4,7 +4,7 @@ import { animate, motion, useInView, useMotionValue, useTransform } from "framer
 import { useEffect, useRef } from "react";
 
 const stats = [
-  { value: 12500, suffix: "+", label: "Trainers using FlexFlow" },
+  { value: 12500, suffix: "+", label: "Trainers using Reppod" },
   { value: 480000, suffix: "+", label: "Workouts delivered" },
   { value: 97, suffix: "%", label: "Client retention" },
   { value: 4.9, suffix: "/5", label: "Avg trainer rating", decimals: 1 },

@@ -34,7 +34,7 @@ export default function Sidebar() {
         <span className="p-1.5 rounded-lg bg-gradient-to-br from-fuchsia-500 to-orange-500">
           <Dumbbell className="size-4 text-white" />
         </span>
-        <span className="font-bold tracking-tight text-white">FlexFlow</span>
+        <span className="font-bold tracking-tight text-white">Reppod</span>
       </Link>
 
       <nav className="flex-1 px-3 py-6 space-y-1">

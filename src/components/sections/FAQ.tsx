@@ -14,7 +14,7 @@ const faqs = [
     a: "Yes — every plan includes a 14-day free trial, no credit card required. You can also click ‘Try the live demo’ to explore a fully populated account right now.",
   },
   {
-    q: "What can I do with FlexFlow?",
+    q: "What can I do with Reppod?",
     a: "Build workouts with drag-and-drop and demo videos, create nutrition plans with macro targets, assign both to clients, track progress with charts and before/after photos, run weekly check-ins, and message clients — all in one place.",
   },
   {

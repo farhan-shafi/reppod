@@ -7,7 +7,7 @@ import { Workout } from "@/models/Workout";
 import { getExercise } from "@/lib/exercises";
 
 export const metadata = {
-  title: "Workouts · FlexFlow",
+  title: "Workouts · Reppod",
 };
 
 export default async function WorkoutsPage() {

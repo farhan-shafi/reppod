@@ -5,7 +5,7 @@ import { User } from "@/models/User";
 import type { SerializedMessage } from "@/lib/schemas/progress";
 import MessageThread from "@/components/messaging/MessageThread";
 
-export const metadata = { title: "Messages · FlexFlow" };
+export const metadata = { title: "Messages · Reppod" };
 
 export default async function ClientMessagesPage() {
   const { client } = await requireClient();

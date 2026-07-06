@@ -9,7 +9,7 @@ import { FoodLog } from "@/models/FoodLog";
 import { computeMacros, type SerializedFoodLog } from "@/lib/schemas/nutrition";
 import ClientNutritionView from "@/components/client-portal/ClientNutritionView";
 
-export const metadata = { title: "Nutrition · FlexFlow" };
+export const metadata = { title: "Nutrition · Reppod" };
 
 export default async function ClientNutritionPage() {
   const { client } = await requireClient();

@@ -5,7 +5,7 @@ import type { SerializedClient } from "@/lib/schemas/client";
 import ClientsView from "./ClientsView";
 
 export const metadata = {
-  title: "Clients · FlexFlow",
+  title: "Clients · Reppod",
 };
 
 export default async function ClientsPage() {

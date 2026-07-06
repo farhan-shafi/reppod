@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/mongoose";
 import { User } from "@/models/User";
 import SettingsForm from "@/components/settings/SettingsForm";
 
-export const metadata = { title: "Settings · FlexFlow" };
+export const metadata = { title: "Settings · Reppod" };
 
 export default async function ClientSettingsPage() {
   const { user: sessionUser } = await requireClient();

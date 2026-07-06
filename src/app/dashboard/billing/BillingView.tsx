@@ -70,7 +70,7 @@ export default function BillingView({
     <div className="space-y-8 max-w-4xl">
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-white">Billing</h1>
-        <p className="mt-1 text-white/60">Manage your FlexFlow subscription.</p>
+        <p className="mt-1 text-white/60">Manage your Reppod subscription.</p>
       </div>
 
       {/* Current plan */}

@@ -30,10 +30,15 @@ const mockProvider: BillingProvider = {
   },
 };
 
-// When real keys are present, return the real provider here instead.
-// (LemonSqueezy is the recommended merchant-of-record for Pakistan-based sellers.)
+// When real keys are present, use LemonSqueezy (merchant-of-record — works for
+// Pakistan-based sellers). Otherwise fall back to the zero-config mock.
 export function getBillingProvider(): BillingProvider {
-  // if (lemonConfigured) return lemonSqueezyProvider;
+  if (lemonConfigured) {
+    // Imported lazily so the mock path never pulls in the LS module.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { lemonSqueezyProvider } = require("./lemonsqueezy") as typeof import("./lemonsqueezy");
+    return lemonSqueezyProvider;
+  }
   return mockProvider;
 }
 

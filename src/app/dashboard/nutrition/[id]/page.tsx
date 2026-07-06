@@ -8,7 +8,7 @@ import MealPlanDetailView from "./MealPlanDetailView";
 
 type Params = { params: Promise<{ id: string }> };
 
-export const metadata = { title: "Meal plan · FlexFlow" };
+export const metadata = { title: "Meal plan · Reppod" };
 
 export default async function MealPlanDetailPage({ params }: Params) {
   const { id } = await params;

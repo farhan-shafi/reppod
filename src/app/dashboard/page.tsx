@@ -1,20 +1,22 @@
 import Link from "next/link";
 import { ClipboardList, MessageSquare, TrendingUp, Users } from "lucide-react";
 
-import { requireUser } from "@/lib/auth-helpers";
+import { requireTrainer } from "@/lib/auth-helpers";
 import { connectDB } from "@/lib/mongoose";
 import { Client } from "@/models/Client";
 import { Workout } from "@/models/Workout";
 import { WorkoutSession } from "@/models/WorkoutSession";
 import { Message } from "@/models/Message";
+import { User } from "@/models/User";
+import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
 
 export default async function DashboardHome() {
-  const user = await requireUser();
+  const user = await requireTrainer();
   await connectDB();
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const [activeCount, totalCount, workoutCount, sessionsThisWeek, messageCount] =
+  const [activeCount, totalCount, workoutCount, sessionsThisWeek, messageCount, me] =
     await Promise.all([
       Client.countDocuments({ trainer: user.id, status: "active" }),
       Client.countDocuments({ trainer: user.id }),
@@ -24,6 +26,7 @@ export default async function DashboardHome() {
         performedAt: { $gte: sevenDaysAgo },
       }),
       Message.countDocuments({ trainer: user.id, senderRole: "client" }),
+      User.findById(user.id).select("businessName").lean<{ businessName?: string } | null>(),
     ]);
 
   const firstName = user.name?.split(" ")[0] ?? "Coach";
@@ -65,6 +68,12 @@ export default async function DashboardHome() {
           Here&apos;s what&apos;s happening across your coaching business today.
         </p>
       </div>
+
+      <OnboardingChecklist
+        businessName={me?.businessName}
+        hasClients={totalCount > 0}
+        hasWorkouts={workoutCount > 0}
+      />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((s) => (

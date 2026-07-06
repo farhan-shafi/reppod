@@ -1,4 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
+import { DEMO_COACH_EMAIL, DEMO_CLIENT_EMAIL } from "@/lib/demo";
 
 export const authConfig = {
   pages: {
@@ -6,13 +7,32 @@ export const authConfig = {
   },
   providers: [],
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const user = auth?.user as { role?: string } | undefined;
+    authorized({ auth, request }) {
+      const { nextUrl } = request;
+      const user = auth?.user as { role?: string; email?: string } | undefined;
       const isLoggedIn = !!user;
       const role = user?.role ?? "trainer";
       const homeForRole = role === "client" ? "/app" : "/dashboard";
 
       const path = nextUrl.pathname;
+
+      // Read-only demo: block writes from the public demo accounts everywhere
+      // except auth routes (so they can still sign in/out).
+      const isDemo =
+        user?.email === DEMO_COACH_EMAIL || user?.email === DEMO_CLIENT_EMAIL;
+      const isWrite = !["GET", "HEAD", "OPTIONS"].includes(request.method);
+      if (
+        isDemo &&
+        isWrite &&
+        path.startsWith("/api/") &&
+        !path.startsWith("/api/auth")
+      ) {
+        return Response.json(
+          { error: "This is a read-only demo. Sign up to make changes." },
+          { status: 403 }
+        );
+      }
+
       const isOnDashboard = path.startsWith("/dashboard");
       const isOnApp = path.startsWith("/app");
       const isOnAuthPage =

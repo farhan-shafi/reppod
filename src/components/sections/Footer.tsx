@@ -1,17 +1,28 @@
+import Link from "next/link";
 import { Dumbbell } from "lucide-react";
 
-const cols = [
+const cols: { title: string; links: { label: string; href: string }[] }[] = [
   {
     title: "Product",
-    links: ["Features", "Pricing", "Changelog", "Roadmap"],
+    links: [
+      { label: "Features", href: "/#features" },
+      { label: "Pricing", href: "/#pricing" },
+      { label: "Try the demo", href: "/sign-in" },
+    ],
   },
   {
     title: "Company",
-    links: ["About", "Customers", "Careers", "Contact"],
+    links: [
+      { label: "About", href: "/#features" },
+      { label: "Contact", href: "mailto:support@reppod.app" },
+    ],
   },
   {
-    title: "Resources",
-    links: ["Help center", "Blog", "Trainer playbook", "API docs"],
+    title: "Legal",
+    links: [
+      { label: "Terms", href: "/terms" },
+      { label: "Privacy", href: "/privacy" },
+    ],
   },
 ];
 
@@ -24,7 +35,7 @@ export default function Footer() {
             <span className="p-1.5 rounded-lg bg-gradient-to-br from-fuchsia-500 to-orange-500">
               <Dumbbell className="size-4 text-white" />
             </span>
-            <span className="font-bold text-lg text-white">FlexFlow</span>
+            <span className="font-bold text-lg text-white">Reppod</span>
           </div>
           <p className="text-sm text-white/50 max-w-sm">
             The coaching platform built for the next generation of personal
@@ -37,13 +48,13 @@ export default function Footer() {
             <h4 className="text-sm font-semibold text-white mb-3">{c.title}</h4>
             <ul className="space-y-2">
               {c.links.map((l) => (
-                <li key={l}>
-                  <a
-                    href="#"
+                <li key={l.label}>
+                  <Link
+                    href={l.href}
                     className="text-sm text-white/50 hover:text-white transition-colors"
                   >
-                    {l}
-                  </a>
+                    {l.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -52,7 +63,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between gap-4 text-xs text-white/40">
-        <span>© {new Date().getFullYear()} FlexFlow. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} Reppod. All rights reserved.</span>
         <span>Made for trainers who actually train.</span>
       </div>
     </footer>

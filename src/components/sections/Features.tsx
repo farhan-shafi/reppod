@@ -68,7 +68,7 @@ export default function Features() {
             The coaching toolkit, reimagined
           </h2>
           <p className="mt-4 text-white/60 text-lg">
-            Stop stitching together Google Sheets, WhatsApp, and Notion. FlexFlow
+            Stop stitching together Google Sheets, WhatsApp, and Notion. Reppod
             replaces them all.
           </p>
         </motion.div>

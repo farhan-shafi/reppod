@@ -1,4 +1,4 @@
-# 🏋️ FlexFlow
+# 🏋️ Reppod
 
 **A two-sided coaching SaaS for personal trainers and their clients.**
 

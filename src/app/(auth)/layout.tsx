@@ -28,7 +28,7 @@ export default function AuthLayout({
         <span className="p-1.5 rounded-lg bg-gradient-to-br from-fuchsia-500 to-orange-500">
           <Dumbbell className="size-4 text-white" />
         </span>
-        <span className="font-bold tracking-tight">FlexFlow</span>
+        <span className="font-bold tracking-tight">Reppod</span>
       </Link>
 
       <div className="relative z-10 w-full max-w-md">{children}</div>

@@ -238,9 +238,9 @@ async function main() {
       note: i === 0 ? "First check-in!" : i === checkinWeeks.length - 1 ? "Clothes fitting better 🎉" : undefined,
       photos:
         i === 0
-          ? [{ url: "https://picsum.photos/seed/flexflow-before/420/560", pose: "front" }]
+          ? [{ url: "https://picsum.photos/seed/reppod-before/420/560", pose: "front" }]
           : i === checkinWeeks.length - 1
-          ? [{ url: "https://picsum.photos/seed/flexflow-after/420/560", pose: "front" }]
+          ? [{ url: "https://picsum.photos/seed/reppod-after/420/560", pose: "front" }]
           : [],
     });
   }
