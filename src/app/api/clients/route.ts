@@ -4,7 +4,6 @@ import { auth } from "@/auth";
 import { connectDB } from "@/lib/mongoose";
 import { Client } from "@/models/Client";
 import { clientCreateSchema } from "@/lib/schemas/client";
-import { getLimits } from "@/lib/billing/subscription";
 
 export async function GET() {
   const session = await auth();
@@ -48,21 +47,6 @@ export async function POST(request: Request) {
   }
 
   await connectDB();
-
-  // Enforce the plan's client cap.
-  const limits = await getLimits(session.user.id);
-  if (Number.isFinite(limits.maxClients)) {
-    const count = await Client.countDocuments({ trainer: session.user.id });
-    if (count >= limits.maxClients) {
-      return NextResponse.json(
-        {
-          error: `You've reached your plan's limit of ${limits.maxClients} clients. Upgrade to add more.`,
-          code: "PLAN_LIMIT",
-        },
-        { status: 402 }
-      );
-    }
-  }
 
   const created = await Client.create({
     ...parsed.data,

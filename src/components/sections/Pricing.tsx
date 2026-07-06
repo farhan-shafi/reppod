@@ -3,14 +3,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Check } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
-import {
-  CURRENCY_CODES,
-  formatPrice,
-  guessCurrencyFromBrowser,
-  type CurrencyCode,
-} from "@/lib/currency";
 
 const tiers = [
   {
@@ -55,12 +49,6 @@ const tiers = [
 
 export default function Pricing() {
   const [yearly, setYearly] = useState(true);
-  const [currency, setCurrency] = useState<CurrencyCode>("USD");
-
-  // Detect the visitor's likely currency on mount (browser locale).
-  useEffect(() => {
-    setCurrency(guessCurrencyFromBrowser());
-  }, []);
 
   return (
     <section id="pricing" className="relative py-32 px-6">
@@ -83,7 +71,7 @@ export default function Pricing() {
           </p>
         </motion.div>
 
-        <div className="flex flex-col items-center gap-4 mb-12">
+        <div className="flex justify-center mb-12">
           <div className="relative inline-flex p-1 rounded-full border border-white/10 bg-white/5">
             <button
               onClick={() => setYearly(false)}
@@ -118,22 +106,6 @@ export default function Pricing() {
               <span className="relative">Yearly · save 20%</span>
             </button>
           </div>
-
-          {/* Currency selector */}
-          <label className="flex items-center gap-2 text-xs text-white/50">
-            Show prices in
-            <select
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
-              className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 text-white outline-none focus:border-fuchsia-500/50"
-            >
-              {CURRENCY_CODES.map((c) => (
-                <option key={c} value={c} className="bg-zinc-900">
-                  {c}
-                </option>
-              ))}
-            </select>
-          </label>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -163,13 +135,12 @@ export default function Pricing() {
 
                 <div className="mt-4 flex items-baseline gap-1">
                   <span className="text-5xl font-bold text-white">
-                    <AnimatedPrice display={formatPrice(price, currency)} />
+                    <AnimatedPrice value={price} />
                   </span>
                   <span className="text-white/50">/mo</span>
                 </div>
                 <p className="mt-1 text-xs text-white/40">
                   {yearly ? "Billed annually" : "Billed monthly"}
-                  {currency !== "USD" && " · approx, charged in your local currency"}
                 </p>
 
                 <Link
@@ -204,19 +175,20 @@ export default function Pricing() {
   );
 }
 
-function AnimatedPrice({ display }: { display: string }) {
+function AnimatedPrice({ value }: { value: number }) {
   return (
     <span className="inline-block">
+      $
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
-          key={display}
+          key={value}
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -20, opacity: 0 }}
           transition={{ duration: 0.25 }}
           className="inline-block"
         >
-          {display}
+          {value}
         </motion.span>
       </AnimatePresence>
     </span>

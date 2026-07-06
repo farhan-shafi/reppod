@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Check, Loader2, Sparkles } from "lucide-react";
 
@@ -11,68 +12,39 @@ import {
   type BillingCycle,
   type Tier,
 } from "@/lib/billing/plans";
-import {
-  CURRENCY_CODES,
-  formatPrice,
-  guessCurrencyFromBrowser,
-  type CurrencyCode,
-} from "@/lib/currency";
 import { cn } from "@/lib/utils";
-
-const STATUS_LABEL: Record<string, string> = {
-  trialing: "Trial",
-  active: "Active",
-  canceled: "Canceled",
-  past_due: "Past due",
-};
 
 export default function BillingView({
   tier,
-  status,
   cycle: currentCycle,
-  trialDaysLeft,
-  clientCount,
-  maxClients,
-  mock,
 }: {
   tier: Tier;
-  status: string;
   cycle: BillingCycle;
-  trialDaysLeft: number;
-  clientCount: number;
-  maxClients: number;
-  mock: boolean;
 }) {
+  const router = useRouter();
   const [cycle, setCycle] = useState<BillingCycle>(currentCycle);
+  const [currentTier, setCurrentTier] = useState<Tier>(tier);
   const [loadingTier, setLoadingTier] = useState<Tier | null>(null);
-  const [currency, setCurrency] = useState<CurrencyCode>("USD");
 
-  useEffect(() => {
-    setCurrency(guessCurrencyFromBrowser());
-  }, []);
-
-  const capLabel = Number.isFinite(maxClients) ? maxClients : "Unlimited";
-  const usagePct = Number.isFinite(maxClients)
-    ? Math.min(100, Math.round((clientCount / maxClients) * 100))
-    : 0;
-
-  async function checkout(targetTier: Tier) {
+  async function selectPlan(targetTier: Tier) {
+    if (targetTier === currentTier) return;
     setLoadingTier(targetTier);
     try {
-      const res = await fetch("/api/billing/checkout", {
+      const res = await fetch("/api/billing/activate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tier: targetTier, cycle }),
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.url) {
-        alert(data.error ?? "Could not start checkout.");
-        setLoadingTier(null);
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        alert(d.error ?? "Could not change plan.");
         return;
       }
-      window.location.href = data.url;
+      setCurrentTier(targetTier);
+      router.refresh();
     } catch {
       alert("Network error. Try again.");
+    } finally {
       setLoadingTier(null);
     }
   }
@@ -80,53 +52,24 @@ export default function BillingView({
   return (
     <div className="space-y-8 max-w-4xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Billing</h1>
-        <p className="mt-1 text-white/60">Manage your Reppod subscription.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-white">Your plan</h1>
+        <p className="mt-1 text-white/60">
+          Every plan is free while Reppod is in early access — switch anytime.
+        </p>
       </div>
 
       {/* Current plan */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-semibold text-white">
-                {PLANS[tier].name} plan
-              </h2>
-              <span className="px-2 py-0.5 rounded-full text-xs bg-white/10 text-white/70">
-                {STATUS_LABEL[status] ?? status}
-              </span>
-            </div>
-            {status === "trialing" && (
-              <p className="mt-1 text-sm text-fuchsia-300">
-                {trialDaysLeft} day{trialDaysLeft === 1 ? "" : "s"} left in your Pro trial
-              </p>
-            )}
-          </div>
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 flex items-center justify-between">
+        <div>
+          <span className="text-xs text-white/50">Current plan</span>
+          <p className="text-lg font-semibold text-white">
+            {PLANS[currentTier].name}
+          </p>
         </div>
-
-        <div className="mt-5">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-white/60">Clients</span>
-            <span className="text-white/80">
-              {clientCount} / {capLabel}
-            </span>
-          </div>
-          {Number.isFinite(maxClients) && (
-            <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-fuchsia-500 to-orange-500"
-                style={{ width: `${usagePct}%` }}
-              />
-            </div>
-          )}
-        </div>
+        <span className="px-3 py-1 rounded-full text-xs bg-emerald-500/15 text-emerald-300">
+          Active · Free
+        </span>
       </div>
-
-      {mock && (
-        <p className="text-xs text-white/40 -mt-4">
-          Demo mode — checkout is simulated, no real payment is taken.
-        </p>
-      )}
 
       {/* Cycle toggle */}
       <div className="flex justify-center">
@@ -159,7 +102,7 @@ export default function BillingView({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {TIERS.map((t) => {
           const plan = PLANS[t];
-          const isCurrent = t === tier && status !== "trialing";
+          const isCurrent = t === currentTier;
           const price = priceFor(t, cycle);
           return (
             <div
@@ -177,14 +120,12 @@ export default function BillingView({
               <h3 className="text-lg font-semibold text-white">{plan.name}</h3>
               <p className="mt-1 text-xs text-white/50">{plan.tagline}</p>
               <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-4xl font-bold text-white">
-                  {formatPrice(price, currency)}
-                </span>
+                <span className="text-4xl font-bold text-white">${price}</span>
                 <span className="text-white/50 text-sm">/mo</span>
               </div>
 
               <button
-                onClick={() => checkout(t)}
+                onClick={() => selectPlan(t)}
                 disabled={isCurrent || loadingTier !== null}
                 className={cn(
                   "w-full mt-5 py-2.5 rounded-full text-sm font-medium transition inline-flex items-center justify-center gap-2 disabled:opacity-60",
@@ -196,7 +137,7 @@ export default function BillingView({
                 )}
               >
                 {loadingTier === t && <Loader2 className="size-3.5 animate-spin" />}
-                {isCurrent ? "Current plan" : <><Sparkles className="size-3.5" /> Choose {plan.name}</>}
+                {isCurrent ? "Current plan" : <><Sparkles className="size-3.5" /> Switch to {plan.name}</>}
               </button>
 
               <ul className="mt-6 space-y-2.5">

@@ -3,7 +3,6 @@ import { auth } from "@/auth";
 import { connectDB } from "@/lib/mongoose";
 import { MealPlan } from "@/models/MealPlan";
 import { mealPlanCreateSchema } from "@/lib/schemas/nutrition";
-import { getLimits } from "@/lib/billing/subscription";
 
 export async function GET() {
   const session = await auth();
@@ -43,14 +42,6 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Invalid input" },
       { status: 400 }
-    );
-  }
-
-  const limits = await getLimits(session.user.id);
-  if (!limits.nutrition) {
-    return NextResponse.json(
-      { error: "Nutrition is a Pro feature. Upgrade to build meal plans.", code: "PLAN_LIMIT" },
-      { status: 402 }
     );
   }
 

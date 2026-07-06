@@ -4,27 +4,11 @@ import { Plus, Utensils } from "lucide-react";
 import { requireTrainer } from "@/lib/auth-helpers";
 import { connectDB } from "@/lib/mongoose";
 import { MealPlan } from "@/models/MealPlan";
-import { getLimits } from "@/lib/billing/subscription";
-import UpgradeGate from "@/components/billing/UpgradeGate";
 
 export const metadata = { title: "Nutrition · Reppod" };
 
 export default async function NutritionPage() {
   const user = await requireTrainer();
-
-  const limits = await getLimits(user.id);
-  if (!limits.nutrition) {
-    return (
-      <div className="space-y-6">
-        <h1 className="text-3xl font-bold tracking-tight text-white">Nutrition</h1>
-        <UpgradeGate
-          feature="Nutrition & meal plans"
-          description="Build meal plans with macro targets, assign them to clients, and track their food logs. Available on Pro and Studio."
-        />
-      </div>
-    );
-  }
-
   await connectDB();
 
   const docs = await MealPlan.find({ trainer: user.id })
