@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import SmoothScrollProvider from "@/components/SmoothScrollProvider";
 import AuthSessionProvider from "@/components/AuthSessionProvider";
@@ -40,6 +41,7 @@ export default function RootLayout({
         <AuthSessionProvider>
           <SmoothScrollProvider>{children}</SmoothScrollProvider>
         </AuthSessionProvider>
+        <Analytics />
       </body>
     </html>
   );
