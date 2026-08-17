@@ -2,13 +2,11 @@
 
 import { useRef, useState } from "react";
 import { Loader2, Upload } from "lucide-react";
-
-const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-
-export const cloudinaryConfigured = Boolean(CLOUD_NAME && UPLOAD_PRESET);
-
-const MAX_IMAGE_MB = 10;
+import {
+  ALLOWED_IMAGE_TYPES,
+  cloudinaryConfigured,
+  uploadImage,
+} from "@/lib/cloudinary";
 
 export default function CloudinaryAvatar({
   value,
@@ -33,31 +31,15 @@ export default function CloudinaryAvatar({
       return;
     }
 
-    if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
-      const mb = (file.size / 1024 / 1024).toFixed(0);
-      setError(`That image is ${mb} MB — please keep photos under ${MAX_IMAGE_MB} MB.`);
-      if (inputRef.current) inputRef.current.value = "";
-      return;
-    }
-
     setUploading(true);
     try {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("upload_preset", UPLOAD_PRESET!);
-
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-        { method: "POST", body: form }
+      onChange(await uploadImage(file));
+    } catch (uploadError) {
+      setError(
+        uploadError instanceof Error
+          ? uploadError.message
+          : "Upload failed. Check your connection."
       );
-      const data = await res.json();
-      if (!res.ok || !data.secure_url) {
-        setError(data.error?.message ?? "Upload failed.");
-        return;
-      }
-      onChange(data.secure_url);
-    } catch {
-      setError("Upload failed. Check your connection.");
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -98,7 +80,7 @@ export default function CloudinaryAvatar({
         <input
           ref={inputRef}
           type="file"
-          accept="image/*"
+          accept={ALLOWED_IMAGE_TYPES.join(",")}
           onChange={onFile}
           className="hidden"
         />

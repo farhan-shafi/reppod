@@ -3,6 +3,13 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 import { connectDB } from "@/lib/mongoose";
+import { checkRateLimit } from "@/lib/rate-limit";
+import {
+  emailSchema,
+  getClientAddress,
+  newPasswordSchema,
+  rateLimitKey,
+} from "@/lib/security";
 import { Client } from "@/models/Client";
 import { User } from "@/models/User";
 import { createNotification } from "@/models/Notification";
@@ -40,12 +47,27 @@ export async function GET(_req: Request, { params }: Params) {
 
 const acceptSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: emailSchema,
+  password: newPasswordSchema,
 });
 
 export async function POST(request: Request, { params }: Params) {
   const { token } = await params;
+
+  const rateLimit = await checkRateLimit(
+    rateLimitKey("accept-invite", `${getClientAddress(request)}:${token}`),
+    8,
+    15 * 60 * 1000
+  );
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many attempts. Please try again later." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfter) },
+      }
+    );
+  }
 
   let body: unknown;
   try {

@@ -10,11 +10,15 @@ import { Message } from "@/models/Message";
 import { User } from "@/models/User";
 import OnboardingChecklist from "@/components/dashboard/OnboardingChecklist";
 
+function getSevenDaysAgo() {
+  return new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+}
+
 export default async function DashboardHome() {
   const user = await requireTrainer();
   await connectDB();
 
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = getSevenDaysAgo();
 
   const [activeCount, totalCount, workoutCount, sessionsThisWeek, messageCount, me] =
     await Promise.all([

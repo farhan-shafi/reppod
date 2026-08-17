@@ -3,12 +3,19 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 
 import { connectDB } from "@/lib/mongoose";
+import { checkRateLimit } from "@/lib/rate-limit";
+import {
+  emailSchema,
+  getClientAddress,
+  newPasswordSchema,
+  rateLimitKey,
+} from "@/lib/security";
 import { User } from "@/models/User";
 
 const registerSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: emailSchema,
+  password: newPasswordSchema,
 });
 
 export async function POST(request: Request) {
@@ -25,6 +32,21 @@ export async function POST(request: Request) {
     }
 
     const { name, email, password } = parsed.data;
+    const rateLimit = await checkRateLimit(
+      rateLimitKey("register", `${getClientAddress(request)}:${email}`),
+      5,
+      15 * 60 * 1000
+    );
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many sign-up attempts. Please try again later." },
+        {
+          status: 429,
+          headers: { "Retry-After": String(rateLimit.retryAfter) },
+        }
+      );
+    }
+
     await connectDB();
 
     const existing = await User.findOne({ email });

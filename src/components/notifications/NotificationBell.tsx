@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -34,7 +34,7 @@ export default function NotificationBell() {
   const [items, setItems] = useState<Notification[]>([]);
   const [unread, setUnread] = useState(0);
 
-  async function load() {
+  const load = useCallback(async () => {
     try {
       const res = await fetch("/api/notifications");
       if (!res.ok) return;
@@ -44,13 +44,16 @@ export default function NotificationBell() {
     } catch {
       // ignore
     }
-  }
+  }, []);
 
   useEffect(() => {
-    load();
-    const interval = setInterval(load, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    const initial = window.setTimeout(() => void load(), 0);
+    const interval = window.setInterval(() => void load(), 30000);
+    return () => {
+      window.clearTimeout(initial);
+      window.clearInterval(interval);
+    };
+  }, [load]);
 
   async function toggle() {
     const next = !open;

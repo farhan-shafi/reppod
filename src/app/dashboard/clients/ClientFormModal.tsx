@@ -35,6 +35,18 @@ const emptyForm: FormValues = {
   notes: "",
 };
 
+function initialForm(state: State): FormValues {
+  if (state?.mode !== "edit") return emptyForm;
+  return {
+    name: state.client.name,
+    email: state.client.email ?? "",
+    phone: state.client.phone ?? "",
+    goal: state.client.goal,
+    status: state.client.status,
+    notes: state.client.notes ?? "",
+  };
+}
+
 export default function ClientFormModal({
   state,
   onClose,
@@ -46,25 +58,9 @@ export default function ClientFormModal({
   onCreated: (client: SerializedClient) => void;
   onUpdated: (client: SerializedClient) => void;
 }) {
-  const [form, setForm] = useState<FormValues>(emptyForm);
+  const [form, setForm] = useState<FormValues>(() => initialForm(state));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (state?.mode === "edit") {
-      setForm({
-        name: state.client.name,
-        email: state.client.email ?? "",
-        phone: state.client.phone ?? "",
-        goal: state.client.goal,
-        status: state.client.status,
-        notes: state.client.notes ?? "",
-      });
-    } else if (state?.mode === "create") {
-      setForm(emptyForm);
-    }
-    setError(null);
-  }, [state]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

@@ -42,22 +42,27 @@ export default function LogSessionModal({
   const [workout, setWorkout] = useState<WorkoutDetail | null>(null);
   const [blocks, setBlocks] = useState<SessionBlockInput[]>([]);
   const [notes, setNotes] = useState("");
-  const [loadingWorkout, setLoadingWorkout] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (open && assignments.length > 0 && !selectedId) {
-      setSelectedId(assignments[0].workout.id);
-    }
-  }, [open, assignments, selectedId]);
+  const activeSelectedId = assignments.some(
+    (assignment) => assignment.workout.id === selectedId
+  )
+    ? selectedId
+    : (assignments[0]?.workout.id ?? "");
+  const loadingWorkout = Boolean(
+    open && activeSelectedId && workout?.id !== activeSelectedId
+  );
 
   useEffect(() => {
-    if (!open || !selectedId) return;
+    if (!open || !activeSelectedId) return;
     let active = true;
-    setLoadingWorkout(true);
-    fetch(`/api/workouts/${selectedId}`)
-      .then((r) => r.json())
+    fetch(`/api/workouts/${activeSelectedId}`)
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error ?? "Could not load workout.");
+        return data;
+      })
       .then((data) => {
         if (!active) return;
         const w: WorkoutDetail = data.workout;
@@ -75,14 +80,11 @@ export default function LogSessionModal({
       })
       .catch(() => {
         if (active) setError("Could not load workout.");
-      })
-      .finally(() => {
-        if (active) setLoadingWorkout(false);
       });
     return () => {
       active = false;
     };
-  }, [open, selectedId]);
+  }, [open, activeSelectedId]);
 
   function updateSet(
     blockIdx: number,
@@ -112,7 +114,7 @@ export default function LogSessionModal({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          workoutId: selectedId,
+          workoutId: activeSelectedId,
           blocks,
           notes,
         }),
@@ -168,7 +170,7 @@ export default function LogSessionModal({
                   Workout
                 </span>
                 <select
-                  value={selectedId}
+                  value={activeSelectedId}
                   onChange={(e) => setSelectedId(e.target.value)}
                   className="mt-1 w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-fuchsia-500/50 transition"
                 >

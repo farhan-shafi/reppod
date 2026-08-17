@@ -11,6 +11,10 @@ MERN-style app on **Next.js 16 + MongoDB**, with motion-rich UI throughout.
 > two-sided auth, an invite flow, drag-and-drop builders, file/video uploads,
 > engagement analytics, and in-app notifications.
 
+**[View the live demo →](https://reppod-olive.vercel.app/)**
+
+![Reppod product overview](docs/screenshots/reppod-overview.jpg)
+
 ---
 
 ## ✨ Features
@@ -124,6 +128,12 @@ backfills clients created before the field existed.
   caller (a trainer only touches their own clients/workouts; a client only their
   own data, resolved via `Client.user`).
 - Passwords hashed with bcrypt (cost 12); `passwordHash` is `select: false`.
+- Sign-in, registration, and invite acceptance use a MongoDB-backed rate limiter
+  shared across serverless instances. Limiter keys are SHA-256 hashes, not raw
+  email or IP values.
+- New passwords require 10+ characters with uppercase, lowercase, and a number.
+- Google OAuth identities are resolved to the same MongoDB user IDs used by all
+  protected routes.
 - Deletes cascade: removing a client also removes their assignments, sessions,
   messages, notifications, and linked login — nothing is left orphaned.
 
@@ -141,6 +151,7 @@ backfills clients created before the field existed.
 | `Message`           | One chat message in a trainer↔client thread                        |
 | `Notification`      | An in-app notification for a user                                  |
 | `VideoProgress`     | Per (client, workout, exercise) watch progress: %, completed       |
+| `RateLimit`         | Expiring counters for public authentication endpoints              |
 
 Exercises themselves are a static catalog in `src/lib/exercises.ts` (muscle group
 + equipment), keeping the demo self-contained.
@@ -179,6 +190,8 @@ src/
 │   ├── mongoose.ts  mongodb.ts # Cached connections
 │   ├── auth-helpers.ts  api-helpers.ts
 │   ├── exercises.ts  units.ts  utils.ts
+│   ├── security.ts              # Password/email policy + hashed limiter keys
+│   ├── rate-limit.ts            # MongoDB-backed fixed-window rate limiting
 │   └── schemas/                # Zod: client, workout, progress, video, profile
 ├── models/                     # Mongoose models (see table above)
 ├── auth.ts  auth.config.ts     # Auth.js (split for edge safety)
@@ -196,8 +209,8 @@ src/
 ### Setup
 
 ```bash
-git clone https://github.com/farhan-shafi/flexflow.git
-cd flexflow
+git clone https://github.com/farhan-shafi/reppod.git
+cd reppod
 npm install
 cp .env.example .env.local   # then fill in the values below
 npm run dev                  # http://localhost:3000
@@ -208,17 +221,24 @@ npm run dev                  # http://localhost:3000
 | Variable                              | Required | Notes                                                       |
 | ------------------------------------- | :------: | ----------------------------------------------------------- |
 | `AUTH_SECRET`                         |    ✅    | `openssl rand -base64 32`                                   |
-| `MONGODB_URI`                         |    ✅    | Atlas string or `mongodb://localhost:27017/flexflow`        |
+| `MONGODB_URI`                         |    ✅    | Atlas string or `mongodb://localhost:27017/reppod`          |
 | `GOOGLE_CLIENT_ID` / `..._SECRET`     |    —     | Enables Google sign-in when both are set                    |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`   |    —     | Enables avatar + exercise-video uploads                     |
-| `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`|    —     | Must be an **unsigned** preset; set Resource type to "Auto" for video |
+| `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET`|    —     | Unsigned preset restricted as described below               |
 
 > `NEXT_PUBLIC_*` vars are read at server start — restart `npm run dev` after changing them.
+
+For Cloudinary, the upload preset is the security boundary because browser-side
+checks can be bypassed. Restrict the preset in Cloudinary to the `reppod` folder,
+JPG/PNG/WebP/AVIF images and MP4/WebM/MOV videos, with maximum sizes of 10 MB for
+images and 50 MB for videos. Do not reuse that unsigned preset for other apps.
 
 ### Scripts
 
 ```bash
 npm run dev      # start dev server (Turbopack)
+npm test         # security policy unit tests
+npm run lint     # ESLint
 npm run build    # production build
 npm run start    # serve the production build
 ```
@@ -261,3 +281,9 @@ npm run start    # serve the production build
   speed and SEO.
 - Demo data is self-contained — no external services are required to run the core
   app (Cloudinary and Google are optional enhancements).
+
+---
+
+## License
+
+[MIT](LICENSE) © 2026 Farhan Shafi

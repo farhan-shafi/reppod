@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { newPasswordSchema } from "@/lib/security";
 
 export const profileUpdateSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").optional(),
@@ -10,7 +11,7 @@ export const profileUpdateSchema = z.object({
 
 export const passwordUpdateSchema = z.object({
   currentPassword: z.string().min(1, "Enter your current password"),
-  newPassword: z.string().min(6, "New password must be at least 6 characters"),
+  newPassword: newPasswordSchema,
 });
 
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;

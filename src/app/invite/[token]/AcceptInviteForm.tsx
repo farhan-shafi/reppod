@@ -142,7 +142,7 @@ export default function AcceptInviteForm({ token }: { token: string }) {
           onChange={setPassword}
           required
           autoComplete="new-password"
-          placeholder="At least 6 characters"
+          placeholder="10+ chars, upper/lowercase and number"
           rightSlot={
             <button
               type="button"

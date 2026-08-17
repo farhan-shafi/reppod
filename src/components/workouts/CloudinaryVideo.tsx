@@ -8,8 +8,12 @@ const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
 export const cloudinaryConfigured = Boolean(CLOUD_NAME && UPLOAD_PRESET);
 
-// Cloudinary's free tier caps unsigned video uploads at 100 MB.
-const MAX_VIDEO_MB = 100;
+const MAX_VIDEO_MB = 50;
+const ALLOWED_VIDEO_TYPES = [
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+] as const;
 
 export default function CloudinaryVideo({
   videoUrl,
@@ -29,6 +33,12 @@ export default function CloudinaryVideo({
 
     if (!cloudinaryConfigured) {
       setError("Video uploads aren't configured.");
+      return;
+    }
+
+    if (!(ALLOWED_VIDEO_TYPES as readonly string[]).includes(file.type)) {
+      setError("Use an MP4, WebM, or MOV video.");
+      if (inputRef.current) inputRef.current.value = "";
       return;
     }
 
@@ -111,7 +121,7 @@ export default function CloudinaryVideo({
       <input
         ref={inputRef}
         type="file"
-        accept="video/*"
+        accept={ALLOWED_VIDEO_TYPES.join(",")}
         onChange={onFile}
         className="hidden"
       />

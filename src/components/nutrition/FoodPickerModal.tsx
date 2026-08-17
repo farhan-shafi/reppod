@@ -27,7 +27,6 @@ export default function FoodPickerModal({
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
   const [grams, setGrams] = useState(100);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   // Custom food fields
   const [customMode, setCustomMode] = useState(false);
@@ -47,7 +46,6 @@ export default function FoodPickerModal({
   }, [query, filter]);
 
   function reset() {
-    setSelectedId(null);
     setGrams(100);
     setCustomMode(false);
     setCustomName("");

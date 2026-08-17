@@ -3,11 +3,20 @@ const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
 export const cloudinaryConfigured = Boolean(CLOUD_NAME && UPLOAD_PRESET);
 export const MAX_IMAGE_MB = 10;
+export const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+] as const;
 
 /** Unsigned client-side image upload to Cloudinary. Returns the secure URL. */
 export async function uploadImage(file: File): Promise<string> {
   if (!cloudinaryConfigured) {
     throw new Error("Image uploads aren't configured.");
+  }
+  if (!(ALLOWED_IMAGE_TYPES as readonly string[]).includes(file.type)) {
+    throw new Error("Use a JPG, PNG, WebP, or AVIF image.");
   }
   if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
     const mb = (file.size / 1024 / 1024).toFixed(0);

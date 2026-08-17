@@ -224,7 +224,7 @@ export default function SettingsForm({ role, initial }: Props) {
           value={newPassword}
           onChange={setNewPassword}
           autoComplete="new-password"
-          placeholder="At least 6 characters"
+          placeholder="10+ chars, upper/lowercase and number"
           required
         />
 

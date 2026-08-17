@@ -113,7 +113,7 @@ export default function SignUpForm() {
           onChange={setPassword}
           required
           autoComplete="new-password"
-          placeholder="At least 6 characters"
+          placeholder="10+ chars, upper/lowercase and number"
           rightSlot={
             <button
               type="button"

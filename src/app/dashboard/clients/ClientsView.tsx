@@ -98,6 +98,11 @@ export default function ClientsView({
       )}
 
       <ClientFormModal
+        key={
+          modalState?.mode === "edit"
+            ? `edit-${modalState.client.id}`
+            : (modalState?.mode ?? "closed")
+        }
         state={modalState}
         onClose={() => setModalState(null)}
         onCreated={onCreated}

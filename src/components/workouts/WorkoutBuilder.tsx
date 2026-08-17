@@ -105,7 +105,15 @@ export default function WorkoutBuilder({
       const payload = {
         name: name.trim(),
         description: description.trim(),
-        blocks: blocks.map(({ key: _key, ...rest }) => rest),
+        blocks: blocks.map((block) => ({
+          exerciseId: block.exerciseId,
+          sets: block.sets,
+          reps: block.reps,
+          restSec: block.restSec,
+          notes: block.notes,
+          videoUrl: block.videoUrl,
+          videoDuration: block.videoDuration,
+        })),
       };
 
       const url = editing
